@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha",
     "test:watch": "mocha --watch",
-    "day01": "ts-node day01.ts"
+    "day1": "ts-node day1.ts"
   },
   "author": "",
   "license": "ISC",
