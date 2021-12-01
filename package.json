@@ -5,8 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "mocha",
-    "test:watch": "mocha --watch",
-    "ts": "ts-node"
+    "test:watch": "mocha --watch"
   },
   "author": "",
   "license": "ISC",

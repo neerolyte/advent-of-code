@@ -22,5 +22,5 @@ $ npm run test
 Run a script:
 
 ```
-$ npm run ts -- <some script>
+$ npx ts-node <day>
 ```

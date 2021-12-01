@@ -40,7 +40,6 @@ describe('day1', () => {
   })
 });
 
-
 describe('day1 part2', () => {
   let inputs = [
     199,
