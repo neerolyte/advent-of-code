@@ -22,5 +22,5 @@ $ npm run test
 Run a script:
 
 ```
-$ npx ts-node <day>
+$ npx ts-node dayN
 ```

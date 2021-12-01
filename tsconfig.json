@@ -6,6 +6,6 @@
     "preserveConstEnums": true,
     "target": "es2017"
   },
-  "include": ["src/**/*.ts"],
+  "include": ["*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
