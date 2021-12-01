@@ -1,8 +1,9 @@
 import { expect } from 'chai';
-import { Day1 } from '../day1';
+import { countIncreases } from '../src/day1';
+import * as fs from 'fs';
 
 describe('day 1', () => {
-  const inputs = [
+  const exampleInputs = [
     199,
     200,
     208,
@@ -14,54 +15,27 @@ describe('day 1', () => {
     260,
     263,
   ];
+  const realInputs = fs.readFileSync(__dirname + '/inputs/day1.txt','utf8').trim().split("\n").map((input: string): number => {
+    return parseInt(input);
+  });
 
   describe("part 1", () => {
-    it("gets expected output", () => {
-      let expectedOutput = [
-        '199 (N/A - no previous sum)',
-        '200 (increased)',
-        '208 (increased)',
-        '210 (increased)',
-        '200 (decreased)',
-        '207 (increased)',
-        '240 (increased)',
-        '269 (increased)',
-        '260 (decreased)',
-        '263 (increased)',
-      ];
-      let day1 = new Day1(inputs);
-      let result = day1.getOutputs();
-      expect(result).to.eql(expectedOutput);
+    it("calculates increases with default window of 1", () => {
+      expect(countIncreases(exampleInputs)).to.eql(7);
     })
-
-    it("gets expected count of increases", () => {
-      let day1 = new Day1(inputs);
-      let result = day1.getIncreases();
-      expect(result).to.eql(7);
+    const answer = 1292;
+    it(`is ${answer}`, () => {
+      expect(countIncreases(realInputs)).to.eql(answer);
     })
   });
 
   describe('part 2', () => {
-    it("gets expected output", () => {
-      let expectedOutput = [
-        '607 (N/A - no previous sum)',
-        '618 (increased)',
-        '618 (no change)',
-        '617 (decreased)',
-        '647 (increased)',
-        '716 (increased)',
-        '769 (increased)',
-        '792 (increased)',
-      ];
-      let day1 = new Day1(inputs, 3);
-      let result = day1.getOutputs();
-      expect(result).to.eql(expectedOutput);
+    it("calculates increases with window of 3", () => {
+      expect(countIncreases(exampleInputs, 3)).to.eql(5);
     })
-
-    it("gets expected count of increases", () => {
-      let day1 = new Day1(inputs, 3);
-      let result = day1.getIncreases();
-      expect(result).to.eql(5);
+    const answer = 1262;
+    it(`is ${answer}`, () => {
+      expect(countIncreases(realInputs, 3)).to.eql(answer);
     })
   });
 });

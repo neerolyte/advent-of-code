@@ -18,9 +18,3 @@ Run tests:
 ```
 $ npm run test
 ```
-
-Run a script:
-
-```
-$ npx ts-node dayN
-```
