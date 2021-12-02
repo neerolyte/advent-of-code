@@ -8,10 +8,20 @@ import * as fs from 'fs';
  */
 
 describe('day 2 after peeking', () => {
-  function parseMoves(moves: string[]): move[] {
-    return moves.map((s: string): move => {
+  enum Direction { up, down, forward };
+
+  function parseDirection(direction: string): Direction {
+    switch(direction) {
+      case 'up': return Direction.up;
+      case 'down': return Direction.down;
+      case 'forward': return Direction.forward;
+    }
+    throw new Error('wtf');
+  }
+  function parseMoves(moves: string[]): Move[] {
+    return moves.map((s: string): Move => {
       let a = s.split(' ');
-      return { direction: a[0], distance: parseInt(a[1]) };
+      return { direction: parseDirection(a[0]), distance: parseInt(a[1]) };
     })
   }
   const exampleMoves = parseMoves([
@@ -24,33 +34,32 @@ describe('day 2 after peeking', () => {
   ]);
   const realMoves = parseMoves(fs.readFileSync(__dirname + '/inputs/day2.txt','utf8').trim().split("\n"));
 
-  interface move {
-    direction: string;
+  interface Move {
+    direction: Direction;
     distance: number;
   }
 
-  interface position {
+  interface Position {
     horizontal: number;
     depth: number;
   }
 
-  interface positionWithAim extends position {
+  interface PositionWithAim extends Position {
     aim: number;
   }
 
-  const position0: position = { horizontal: 0, depth: 0 };
-  const applyMove = (current: position, move: move) => {
+  const position0: Position = { horizontal: 0, depth: 0 };
+  const applyMove = (current: Position, move: Move) => {
     // ...current is copying in all of the state from current with any filled in
     // properties overwritten from the right
     switch (move.direction) {
-        case 'forward': return {...current, horizontal: current.horizontal + move.distance};
-        case 'up':      return {...current, depth: current.depth - move.distance};
-        case 'down':    return {...current, depth: current.depth + move.distance};
+        case Direction.forward: return {...current, horizontal: current.horizontal + move.distance};
+        case Direction.up:      return {...current, depth: current.depth - move.distance};
+        case Direction.down:    return {...current, depth: current.depth + move.distance};
     }
-    throw new Error('wtf');
   };
 
-  function multiplyPosition(position: position): number {
+  function multiplyPosition(position: Position): number {
     return position.depth * position.horizontal;
   }
 
@@ -63,18 +72,17 @@ describe('day 2 after peeking', () => {
     })
   })
 
-  const positionWithAim0: positionWithAim = { ...position0, aim: 0 };
-  const applyMoveWithAim = (current: positionWithAim, move: move) => {
+  const positionWithAim0: PositionWithAim = { ...position0, aim: 0 };
+  const applyMoveWithAim = (current: PositionWithAim, move: Move) => {
     switch (move.direction) {
-        case 'forward': return {
+        case Direction.forward: return {
           ...current,
           horizontal: current.horizontal + move.distance,
           depth: current.depth + current.aim * move.distance,
         };
-        case 'up':      return {...current, aim: current.aim - move.distance };
-        case 'down':    return {...current, aim: current.aim + move.distance };
+        case Direction.up:      return {...current, aim: current.aim - move.distance };
+        case Direction.down:    return {...current, aim: current.aim + move.distance };
     }
-    throw new Error('wtf');
   };
   describe("part 2", () => {
     it("calculates example position", () => {
