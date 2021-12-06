@@ -14,15 +14,93 @@ describe("day6", () => {
     return agedTimers.concat(Array(newFish).fill(8));
   }
 
-  it("calculates example fish", () => {
-    expect(age(example)).to.eql([2,3,2,0,1])
-    expect(age([2,3,2,0,1])).to.eql([1,2,1,6,0,8])
+  interface Timers {
+    0: number,
+    1: number,
+    2: number,
+    3: number,
+    4: number,
+    5: number,
+    6: number,
+    7: number,
+    8: number,
+  }
+  const timer0 = {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0,
+    8: 0,
+  }
+
+  function ageTimers(timers: Timers): Timers {
+    return {
+      0: timers[1],
+      1: timers[2],
+      2: timers[3],
+      3: timers[4],
+      4: timers[5],
+      5: timers[6],
+      6: timers[7] + timers[0],
+      7: timers[8],
+      8: timers[0],
+    };
+  }
+
+  function fish2Timers(fish: number[]): Timers {
+    let timers = {...timer0};
+    fish.forEach((timer: number) => {
+      timers[timer as keyof Timers]++;
+    })
+    return timers;
+  }
+
+  function sumTimers(timers: Timers): number {
+    return timers[0]
+      + timers[1]
+      + timers[2]
+      + timers[3]
+      + timers[4]
+      + timers[5]
+      + timers[6]
+      + timers[7]
+      + timers[8]
+  }
+
+  describe("part 1", () => {
+    it("converts array of fish to timers", () => {
+      expect(fish2Timers([3,1,6,8,0,1])).to.eql({...timer0, 0:1, 1:2, 3:1, 6:1, 8:1 })
+    })
+    it("calculates example fish", () => {
+      expect(age(example)).to.eql([2,3,2,0,1])
+      expect(age([2,3,2,0,1])).to.eql([1,2,1,6,0,8])
+    })
+    it("ages timers a", () => {
+      expect(ageTimers({...timer0, 0: 1})).to.eql({...timer0, 6: 1, 8: 1})
+    })
+    it("ages timers b", () => {
+      expect(ageTimers({...timer0, 0: 2, 7: 2, 8: 2})).to.eql({...timer0, 6:4, 7:2, 8:2})
+    })
+    it("calculates real answer", () => {
+      let current = fish2Timers(real);
+      for (let i = 0; i < 80; i++) {
+        current = ageTimers(current);
+      }
+      expect(sumTimers(current)).to.eql(362666)
+    })
   })
-  it("calculates real answer", () => {
-    let current = real;
-    for (let i = 0; i < 80; i++) {
-      current = age(current);
-    }
-    expect(current.length).to.eql(362666)
+
+  describe("part 2", () => {
+    it("calculates real answer", () => {
+      let current = fish2Timers(real);
+      for (let i = 0; i < 256; i++) {
+        current = ageTimers(current);
+      }
+      expect(sumTimers(current)).to.eql(1640526601595)
+    })
   })
 })
