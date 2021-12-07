@@ -24,4 +24,35 @@ describe("day 7", () => {
       expect(calculateFuel(real, calculateTarget(real))).to.eql(353800)
     })
   })
+
+  describe("part 2", () => {
+    function calculateTarget(crabs: number[]): number {
+      return Math.round(crabs.reduce((previous, current, index) => {
+        return previous + (current - previous)/(index+1);
+      }, 0))
+    }
+    it("calculates cheapest target", () => {
+      expect(calculateTarget(example)).to.eql(5);
+    })
+    function calculateFuel(crabs: number[], target: number): number {
+      return crabs.reduce((previous, current) => {
+        let steps = Math.abs(current - target);
+        return previous + ((steps * (steps + 1)) / 2);
+      }, 0)
+    }
+    it("calculates total fuel", () => {
+      expect(calculateFuel(example, 5)).to.eql(168)
+      expect(calculateFuel(example, 2)).to.eql(206)
+    })
+    it("calculate answer", () => {
+      // I'm obviously not calculating the right target, so search a bit to each
+      // side :shrug:
+      let target = calculateTarget(real);
+      let fuels: number[] = [];
+      for (let i = target - 20; i < target + 20; i++) {
+        fuels.push(calculateFuel(real, i))
+      }
+      expect(Math.min(...fuels)).to.eql(98119739)
+    })
+  })
 })
