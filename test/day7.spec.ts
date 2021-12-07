@@ -26,10 +26,13 @@ describe("day 7", () => {
   })
 
   describe("part 2", () => {
+    function average(numbers: number[]): number {
+      return numbers.reduce((previous, current) => {
+        return previous + current;
+      }) / numbers.length
+    }
     function calculateTarget(crabs: number[]): number {
-      return Math.round(crabs.reduce((previous, current, index) => {
-        return previous + (current - previous)/(index+1);
-      }, 0))
+      return Math.round(average(crabs))
     }
     it("calculates cheapest target", () => {
       expect(calculateTarget(example)).to.eql(5);
