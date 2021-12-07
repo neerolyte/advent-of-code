@@ -11,9 +11,7 @@ describe('day 2', () => {
     'down 8',
     'forward 2',
   ];
-  const realMoves = fs.readFileSync(__dirname + '/inputs/day2.txt','utf8').trim().split("\n").map((input: string): string => {
-    return input;
-  });
+  const realMoves = fs.readFileSync(__dirname + '/inputs/day2.txt','utf8').trim().split("\n");
 
   describe("part 1", () => {
     it("converts move", () => {
