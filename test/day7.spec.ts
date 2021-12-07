@@ -44,12 +44,13 @@ describe("day 7", () => {
       expect(calculateFuel(example, 5)).to.eql(168)
       expect(calculateFuel(example, 2)).to.eql(206)
     })
-    it("calculate answer", () => {
+    it("calculates answer", () => {
       // I'm obviously not calculating the right target, so search a bit to each
       // side :shrug:
       let target = calculateTarget(real);
       let fuels: number[] = [];
-      for (let i = target - 20; i < target + 20; i++) {
+      let range = 5;
+      for (let i = target - range; i < target + range; i++) {
         fuels.push(calculateFuel(real, i))
       }
       expect(Math.min(...fuels)).to.eql(98119739)
