@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-describe("day 8", () => {
+describe.skip("day 8", () => {
   /*
    *  aaaa
    * b    c
