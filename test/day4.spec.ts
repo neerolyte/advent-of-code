@@ -746,28 +746,78 @@ describe("day 4", () => {
      ],
   }
 
-  describe("part 1", () => {
-    function matchedSquares(board: Board, drawn: DrawnNumbers) {
-      return board.map((row) => {
-        return row.map((v) => {
-          return drawn.includes(v)
-        })
+  type Winner = {
+    board: Board,
+    drawn: DrawnNumbers,
+  }
+
+  function finalScore(winner: Winner): number {
+    let last = winner.drawn[winner.drawn.length - 1]
+    return winner.board.reduce((p, row) => {
+      return p + row.reduce((p, v) => {
+        return p + (winner.drawn.includes(v) ? 0 : v)
+      }, 0)
+    }, 0) * last;
+  }
+  function findWinningNumbers(board: Board, drawn: DrawnNumbers): DrawnNumbers {
+    return drawn.slice(0, drawn.findIndex((_, i) => {
+      return hasWon(board, drawn.slice(0, i))
+    }))
+  }
+  function findWinner(problem: Problem): Winner {
+    let winningBoard = null;
+    let winningNumberIndex = problem.drawn.findIndex((_, i) => {
+      let winningBoardIndex = problem.boards.findIndex((board) => {
+        if (hasWon(board, problem.drawn.slice(0, i))) {
+          winningBoard = board;
+          return true;
+        }
+        return false;
       });
+      if (winningBoardIndex < 0) {
+        return false;
+      }
+      return true;
+    });
+    return {
+      board: winningBoard,
+      drawn: problem.drawn.slice(0, winningNumberIndex),
     }
-    function hasWinningRow(board: Board, drawn: DrawnNumbers): boolean {
-      return board.some((row) => {
-        return row.every((v) => (drawn.includes(v)))
-      })
+  }
+  function findLastWinner(problem: Problem): Winner {
+    let boardNumbers = problem.boards.map((board) => {
+      return findWinningNumbers(board, problem.drawn)
+    })
+    let board: Board = problem.boards[0];
+    let drawn: DrawnNumbers = boardNumbers[0];
+    for (let i = 1; i < boardNumbers.length; i++) {
+      if (boardNumbers[i].length < drawn.length) {
+        continue;
+      }
+      board = problem.boards[i];
+      drawn = boardNumbers[i];
     }
-    function transpose(board: Board): Board {
-      return board.map((_, colIndex): Row => board.map(row => row[colIndex]) as Row) as Board;
+    return {
+      board: board,
+      drawn: drawn,
     }
-    function hasWinningColumn(board: Board, drawn: DrawnNumbers): boolean {
-      return hasWinningRow(transpose(board), drawn)
-    }
-    function hasWon(board: Board, drawn: DrawnNumbers) {
-      return hasWinningRow(board, drawn) || hasWinningColumn(board, drawn);
-    }
+  }
+  function hasWinningRow(board: Board, drawn: DrawnNumbers): boolean {
+    return board.some((row) => {
+      return row.every((v) => (drawn.includes(v)))
+    })
+  }
+  function transpose(board: Board): Board {
+    return board.map((_, colIndex): Row => board.map(row => row[colIndex]) as Row) as Board;
+  }
+  function hasWinningColumn(board: Board, drawn: DrawnNumbers): boolean {
+    return hasWinningRow(transpose(board), drawn)
+  }
+  function hasWon(board: Board, drawn: DrawnNumbers) {
+    return hasWinningRow(board, drawn) || hasWinningColumn(board, drawn);
+  }
+
+  describe("part 1", () => {
     [
       [example.boards[2], [], false],
       [example.boards[2], example.drawn, true],
@@ -780,30 +830,6 @@ describe("day 4", () => {
         expect(hasWon(board, drawn)).to.eql(expected)
       })
     })
-    type Winner = {
-      board: Board,
-      drawn: DrawnNumbers,
-    }
-    function findWinner(problem: Problem): Winner {
-      let winningBoard = null;
-      let winningNumberIndex = problem.drawn.findIndex((_, i) => {
-        let winningBoardIndex = problem.boards.findIndex((board) => {
-          if (hasWon(board, problem.drawn.slice(0, i))) {
-            winningBoard = board;
-            return true;
-          }
-          return false;
-        });
-        if (winningBoardIndex < 0) {
-          return false;
-        }
-        return true;
-      });
-      return {
-        board: winningBoard,
-        drawn: problem.drawn.slice(0, winningNumberIndex),
-      }
-    }
     it("finds winning board", () => {
       expect(
         findWinner(example)
@@ -812,14 +838,6 @@ describe("day 4", () => {
         drawn: [7,4,9,5,11,17,23,2,0,14,21,24]
       })
     })
-    function finalScore(winner: Winner): number {
-      let last = winner.drawn[winner.drawn.length - 1]
-      return winner.board.reduce((p, row) => {
-        return p + row.reduce((p, v) => {
-          return p + (winner.drawn.includes(v) ? 0 : v)
-        }, 0)
-      }, 0) * last;
-    }
     it("calculates final score", () => {
       expect(finalScore(findWinner(example))).to.eql(4512)
     })
@@ -829,5 +847,11 @@ describe("day 4", () => {
   })
 
   describe("part 2", () => {
+    it("calculates final score", () => {
+      expect(finalScore(findLastWinner(example))).to.eql(1924);
+    })
+    it("calculates answer", () => {
+      expect(finalScore(findLastWinner(real))).to.eql(1924);
+    })
   })
 })
