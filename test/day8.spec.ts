@@ -367,20 +367,20 @@ describe("day 8", () => {
         'abcdef',
       ])
     })
-    it.skip("calculates digits 2", () => {
+    it("calculates digits 2", () => {
       expect(calculateDigits(
         'be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe'
       )).to.eql([
-        '',
+        'abdefg',
         'be',
-        '',
-        '',
+        'abcdf',
+        'bcdef',
         'bceg',
-        '',
-        '',
+        'cdefg',
+        'acdefg',
         'bde',
         'abcdefg',
-        '',
+        'bcdefg',
       ])
     })
     function calculateNumber(line: string) {
