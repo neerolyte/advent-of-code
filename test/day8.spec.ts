@@ -243,5 +243,176 @@ describe("day 8", () => {
   })
 
   describe("part 2", () => {
+    interface Digits {
+      0: string,
+      1: string,
+      2: string,
+      3: string,
+      4: string,
+      5: string,
+      6: string,
+      7: string,
+      8: string,
+      9: string
+    }
+    const digitCounts = {
+      0: 6,
+      1: 2,
+      2: 5,
+      3: 5,
+      4: 4,
+      5: 5,
+      6: 6,
+      7: 3,
+      8: 7,
+      9: 6,
+    };
+    const possibleDigitsFromLength = {
+      2: [1],
+      3: [7],
+      4: [4],
+      5: [2,3,5],
+      6: [0,6,9],
+      7: [8],
+    }
+    function subset(needle: string, haystack: string): boolean {
+      return needle.split('').every((l) => (haystack.includes(l)));
+    }
+    [
+      ['ab', 'abc', true],
+      ['ad', 'abc', false],
+      ['ac', 'abc', true],
+    ].forEach((v: any[]) => {
+      let needle: string, haystack: string, expected: boolean;
+      [needle, haystack, expected] = v;
+      it(`knows if digit is subset of another - ${v}`, () => {
+        expect(subset(needle, haystack)).to.eql(expected);
+      })
+    })
+    function getDigit(v: string, digits: string[]) {
+      switch (v.length) {
+        case 2: return 1;
+        case 3: return 7;
+        case 4: return 4;
+        case 7: return 8;
+        case 5:
+          if (digits[1]) {
+            if (subset(digits[1], v)) {
+              return 3;
+            } else {
+              if (digits[6]) {
+                return subset(v, digits[6]) ? 5 : 2;
+              }
+            }
+          }
+        break;
+        case 6:
+          if (digits[1]) {
+            if (subset(digits[1], v)) {
+              // 0 or 9
+              if (digits[5]) {
+                return subset(digits[5], v) ? 9 : 0;
+              }
+            } else {
+              return 6;
+            }
+          }
+        break;
+      }
+      return null;
+    }
+    [
+      ['ab', [], 1],
+      ['abc', [], 7],
+      ['abcd', [], 4],
+      ['abcdefg', [], 8],
+      ['abcdeg', [,'ab','acdfg','abcdf','abef','bcdef','bcdefg','abd','abcdefg',], 0],
+      ['abcdef', [,'ab','acdfg','abcdf','abef','bcdef','bcdefg','abd','abcdefg',], 9],
+    ].forEach((v: any[]) => {
+      let search: string, digits: string[], expected: number;
+      [search, digits, expected] = v;
+      it(`calculates one digit - ${v}`, () => {
+        expect(getDigit(search, digits)).to.eql(expected);
+      })
+    })
+    function calculateDigits(line: string): string[] {
+      let digits: string[] = Array(10)
+      let inputs = line.split(' | ')[0].split(' ').map((s) => ( s.split('').sort().join('') ))
+      let known: string[] = [];
+      let limit = 1000
+      while (limit-- > 0 && known.length < 10) {
+        inputs.filter((v) => (!known.includes(v))).forEach((v) => {
+          let digit: number = getDigit(v, digits);
+          if (digit !== null) {
+            known.push(v);
+            digits[digit] = v;
+          }
+        })
+      }
+      return digits;
+    }
+    it("calculates digits", () => {
+      expect(calculateDigits(
+        'acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf'
+      )).to.eql([
+        'abcdeg',
+        'ab',
+        'acdfg',
+        'abcdf',
+        'abef',
+        'bcdef',
+        'bcdefg',
+        'abd',
+        'abcdefg',
+        'abcdef',
+      ])
+    })
+    it.skip("calculates digits 2", () => {
+      expect(calculateDigits(
+        'be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe'
+      )).to.eql([
+        '',
+        'be',
+        '',
+        '',
+        'bceg',
+        '',
+        '',
+        'bde',
+        'abcdefg',
+        '',
+      ])
+    })
+    function calculateNumber(line: string) {
+      let digits = calculateDigits(line);
+      let outputs = line.split(' | ')[1].split(' ').map((s) => ( s.split('').sort().join('') ))
+      return parseInt(outputs.map((v) => {
+        return digits.findIndex((digit) => {
+          return digit === v;
+        })
+      }).join(''))
+    }
+    it("calculates output number for one line", () => {
+      expect(calculateNumber(
+        'acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf'
+      )).to.eql(5353)
+    })
+    it("calculates output number for one line 2", () => {
+      expect(calculateNumber(
+        'be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe'
+      )).to.eql(8394)
+    })
+    function calculateOutput(lines: string[]): number {
+      return lines.map((line) => {
+        let num = calculateNumber(line)
+        return num
+      }).reduce((p, c): number => (p+c), 0)
+    }
+    it("calcultes output number", () => {
+      expect(calculateOutput(example)).to.eql(61229);
+    })
+    it("calculates answer", () => {
+      expect(calculateOutput(real)).to.eql(908067)
+    })
   })
 })
