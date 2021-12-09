@@ -851,7 +851,7 @@ describe("day 4", () => {
       expect(finalScore(findLastWinner(example))).to.eql(1924);
     })
     it("calculates answer", () => {
-      expect(finalScore(findLastWinner(real))).to.eql(1924);
+      expect(finalScore(findLastWinner(real))).to.eql(11377);
     })
   })
 })
