@@ -124,7 +124,9 @@ describe("day 17", () => {
   }
 
   function possibleXStartSpeeds(target: Target): number[] {
-    return _.range(0, max(target.x) + 1)
+    // x can't be less than the triangle number that's within the target
+    let minx = Math.floor(Math.sqrt(min(target.x)*2))
+    return _.range(minx, max(target.x) + 1)
     .filter((x) => isValidXStartSpeed(x, target))
   }
 
