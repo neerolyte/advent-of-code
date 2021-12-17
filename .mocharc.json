@@ -8,5 +8,7 @@
   "watch-files": [
     "./test/*.spec.ts",
     "./src/*.ts"
-  ]
+  ],
+  "slow": 1,
+  "timeout": 20000
 }
