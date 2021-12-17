@@ -24,21 +24,7 @@ describe("day 17", () => {
   const probeStartPoint: Point = { x: 0, y:0 };
 
   function calculateMaxYSpeed(target: Target): number {
-    let maxy: number = 0;
-    let matched: boolean = false;
-    possibleXVelocities(target).forEach((x) => {
-      for (let y = maxy; y <= 500; y++) {
-        let start: State = {
-          point: {...probeStartPoint},
-          velocity: {x: x, y: y},
-        };
-        if (hitsTarget(start, target)) {
-          maxy = y;
-          matched = true;
-        }
-      }
-    })
-    return matched ? maxy : -1;
+    return max(possibleYSpeeds(target))
   }
 
   function calculateMaxYHeightFromYSpeed(y: number): number {
@@ -47,14 +33,9 @@ describe("day 17", () => {
 
   function hitsTarget(start: State, target: Target): boolean {
     let state = {...start};
-    while (state.point.y >= min(target.y) || state.velocity.y >= 0) {
+    while (state.point.y >= min(target.y) && state.point.x <= max(target.x)) {
       state = step(state);
       if (withinTarget(state.point, target)) {
-        /*
-        console.log({
-          start: start,
-          state: state,
-        })//*/
         return true;
       }
     }
@@ -79,18 +60,9 @@ describe("day 17", () => {
     return 0;
   }
 
-  function step(start: State): State
+  function step(state: State): State
   {
-    return {
-      point: {
-        x: start.point.x + start.velocity.x,
-        y: start.point.y + start.velocity.y,
-      },
-      velocity: {
-        x: drag(start.velocity.x),
-        y: start.velocity.y - 1,
-      },
-    }
+    return stepX(stepY(state))
   }
 
   function stepX(start: State): State
@@ -107,7 +79,21 @@ describe("day 17", () => {
     }
   }
 
-  function validXVelocity(x: number, target: Target): boolean {
+  function stepY(start: State): State
+  {
+    return {
+      point: {
+        ...start.point,
+        y: start.point.y + start.velocity.y,
+      },
+      velocity: {
+        ...start.velocity,
+        y: start.velocity.y - 1,
+      },
+    }
+  }
+
+  function isValidXStartSpeed(x: number, target: Target): boolean {
     let start: State = {
       point: { x: 0, y: target.y[0] },
       velocity: { x: x, y: 0 }
@@ -122,25 +108,41 @@ describe("day 17", () => {
     return false;
   }
 
-  function possibleXVelocities(target: Target): number[] {
+  function isValidYStartSpeed(y: number, target: Target): boolean {
+    let start: State = {
+      point: { x: target.x[0], y: 0 },
+      velocity: { x: 0, y: y }
+    }
+    let state = {...start};
+    while (state.point.y >= min(target.y) || state.velocity.y >= 0) {
+      state = stepY(state);
+      if (withinTarget(state.point, target)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function possibleXStartSpeeds(target: Target): number[] {
     return _.range(0, max(target.x) + 1)
-    .filter((x) => validXVelocity(x, target))
+    .filter((x) => isValidXStartSpeed(x, target))
+  }
+
+  function possibleYSpeeds(target: Target): number[] {
+    return _.range(min(target.y), -min(target.y))
+    .filter((y) => isValidYStartSpeed(y, target))
   }
 
   function initialValidVelocities(target: Target): Velocity[] {
     let velocities: Velocity[] = [];
-    possibleXVelocities(target).forEach((x) => {
-      for (let y = min(target.y); y <= 500; y++) {
-        let start: State = {
-          point: {...probeStartPoint},
-          velocity: {x: x, y: y},
-        };
-        if (hitsTarget(start, target)) {
-          velocities.push(start.velocity);
-        }
-      }
+    let xRange: number[] = possibleXStartSpeeds(target);
+    let yRange: number[] = possibleYSpeeds(target);
+    xRange.forEach((x) => {
+      yRange.forEach((y) => {
+        velocities.push({x:x, y:y})
+      })
     })
-    return velocities;
+    return velocities.filter((v) => hitsTarget({point: {...probeStartPoint}, velocity: v}, target));
   }
 
   describe("part 1", () => {
@@ -191,14 +193,14 @@ describe("day 17", () => {
       let target: Target, expected: boolean;
       [target, expected] = v;
       it(`knows valid xs - ${JSON.stringify(v)}`, () => {
-        expect(possibleXVelocities(target)).to.eql(expected);
+        expect(possibleXStartSpeeds(target)).to.eql(expected);
       });
     });
 
     it("knows maximum y of example", () => {
       expect(calculateMaxYHeightFromYSpeed(calculateMaxYSpeed(example))).to.eql(45);
     });
-    it("knows maximum y of answer", () => {
+    it("knows maximum y of challenge", () => {
       // 500500 is too high
       // 29999 is too high
       // 1000 is too low
@@ -207,6 +209,15 @@ describe("day 17", () => {
   });
 
   describe("part 2", () => {
+    [
+      [example, _.range(-10, 10)],
+    ].forEach((v: any[]) => {
+      let target: Target, expected: boolean;
+      [target, expected] = v;
+      it(`knows valid ys - ${JSON.stringify(v)}`, () => {
+        expect(possibleYSpeeds(target)).to.eql(expected);
+      });
+    });
     it("knows initial valid velocities of example", () => {
       expect(initialValidVelocities(example).length).to.eql(112)
     });
