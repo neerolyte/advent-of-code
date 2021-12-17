@@ -127,6 +127,22 @@ describe("day 17", () => {
     .filter((x) => validXVelocity(x, target))
   }
 
+  function initialValidVelocities(target: Target): Velocity[] {
+    let velocities: Velocity[] = [];
+    possibleXVelocities(target).forEach((x) => {
+      for (let y = min(target.y); y <= 500; y++) {
+        let start: State = {
+          point: {...probeStartPoint},
+          velocity: {x: x, y: y},
+        };
+        if (hitsTarget(start, target)) {
+          velocities.push(start.velocity);
+        }
+      }
+    })
+    return velocities;
+  }
+
   describe("part 1", () => {
     [
       [{x:20,y:-10}, true],
@@ -188,5 +204,14 @@ describe("day 17", () => {
       // 1000 is too low
       expect(calculateMaxYHeightFromYSpeed(calculateMaxYSpeed(real))).to.eql(5995);
     });
-  })
+  });
+
+  describe("part 2", () => {
+    it("knows initial valid velocities of example", () => {
+      expect(initialValidVelocities(example).length).to.eql(112)
+    });
+    it("knows initial valid velocities of challenge", () => {
+      expect(initialValidVelocities(real).length).to.eql(3202)
+    });
+  });
 })
