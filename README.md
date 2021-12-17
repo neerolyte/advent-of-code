@@ -18,3 +18,9 @@ Run tests:
 ```
 $ npm run test
 ```
+
+Run one day:
+
+```
+$ npm run test:watch -- --grep 'day 17'
+```
